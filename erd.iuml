@@ -1,0 +1,171 @@
+@startuml ERD
+skinparam dpi 120
+
+hide methods
+hide stereotypes
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+' Functions
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+''
+'' 表
+''
+'' @param string $name 表名
+'' @param string $desc 详细描述
+''
+!unquoted function Table($name,$desc = "",$t_color = "#FEFECE")
+    !return "class " + $name + ' as "' + $name + '\n(' + $desc + ')"<< (T,#FFAAAA) >>' + $t_color
+!endfunction
+
+''
+'' 主键
+''
+'' @param string $col 列名
+''
+!unquoted function PK($col = "id")
+    !return "<PK><b>" + $col + "</b>"
+!endfunction 
+''
+'' 外键
+''
+'' @param string $col 列名
+''
+!unquoted function FK($col = "id")
+    !return "<FK><b>" + $col + "</b>"
+!endfunction
+''
+'' 非空
+''
+'' @param string $col 列名
+''
+!function NN($col)
+    !return "<u>" + $col + "</u>"
+!endfunction
+
+''
+'' 唯一
+''
+'' @param string $col 列名
+''
+!function UQ($col)
+    !return "<color:green>" + $col + "</color>"
+!endfunction
+
+''
+'' 缺省值
+''
+'' @param string $val 缺省值
+''
+!function DV($val)
+    !return "<u>" + $val + "</u>"
+!endfunction
+
+''
+'' 无符号数值，unsigned
+''
+'' @param string $type 类型
+''
+!function UN($type)
+    !return "U_" + $type
+!endfunction
+
+''
+'' 注释
+''
+'' @param string $label 列标题
+'' @param string $desc 详细描述
+''
+!function CM($label, $desc="")
+    !$val = "<color:#C05050>" + $label
+    !if ($desc != "")
+        !$val = $val + "\n" + "<size:8><color:gray><i>“" + $desc + "”</i></color></size>"
+    !endif
+    !return $val
+!endfunction
+
+''
+'' 列
+''
+'' @param string $name 列名
+'' @param string $type 数据类型
+'' @param boolean $notNull 是否非空 0:可空，1:非空，缺省为0
+'' @param mixed $defVal 缺省值 无缺省值时传空字符串""，缺省值为空字符串时传单引号"''"
+'' @param string $label 列标题
+'' @param string $desc 详细描述
+'' 
+!function Column($name, $type, $notNull=0, $defVal="", $label="", $desc="")
+    !$val = ""
+    !if ($notNull == 1)
+        !$name = NN($name)
+    !endif
+    !$val = $name + " <color:royalBlue><size:8>" + %upper($type)
+    !if ($defVal != "")
+        !$val = $val + " " + DV($defVal)
+    !endif
+    !if ($label != "")
+        !$val = $val + " " + CM($label, $desc)
+    !endif
+    !return $val
+!endfunction
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+' Constants
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+' gmt_create、gmt_modified、is_deleted 创建、修改、删除 标记
+!global TIMESTAMPS = Column("gmt_create","TIMESTAMP",0,"","创建时间") + "\n" + Column("gmt_modified","TIMESTAMP",0,"","修改时间") + "\n" + Column("is_deleted","tinyint[1]",0,"","是否删除","正常0-删除1")
+
+' 主键类型
+!global PK_TYPE = UN("BIGINT[20]")
+
+' 主键列
+!$tmp = PK()
+!global PRIMARY_KEY = Column($tmp, PK_TYPE)
+
+' 列注释中的换行符
+!global CMBR="\n<size:8><color:gray><i>"
+''
+'' 图例
+''
+!definelong TABLE_KEY_LEGEND()
+hide stereotype
+legend right
+|=    |= Name        |= Desc |
+|=<#FFE8E0> | #FFE8E0 | 主表 |
+|=<#FEFECE> | #FEFECE | 默认 |
+|=<#DDEEFF> | #DDEEFF | 关系表 |
+|=<#D8F9D3> | #D8F9D3 | 单表 |
+|=<#EFEFEF> | #EFEFEF | 日志表 |
+| <PK> | Primary Key | 主键 |
+| <FK> | Foreign Key | 外键 |
+| <UK> | Unique  Key | 唯一约束 |
+endlegend
+!enddefinelong
+''
+'' 图例
+''
+!definelong ERD_LEGEND($author="",$date="",$dbName="")
+hide stereotype
+legend right
+|=    |= Name        |= Desc |
+|=<#FFE8E0> | #FFE8E0 | 主表 |
+|=<#FEFECE> | #FEFECE | 默认 |
+|=<#DDEEFF> | #DDEEFF | 关系表 |
+|=<#D8F9D3> | #D8F9D3 | 单表 |
+|=<#EFEFEF> | #EFEFEF | 日志表 |
+| <PK> | Primary Key | 主键 |
+| <FK> | Foreign Key | 外键 |
+| <UK> | Unique  Key | 唯一约束 |
+|= 维护者 |= 　更新日期 |= 数据库名 |
+|<#FAFAFA> $author |<#FAFAFA> $date |<#FAFAFA> $dbName |
+endlegend
+!enddefinelong
+
+
+!define MAIN_TABLE #FFE8E0
+!define RELATION_TABLE #DDEEFF
+!define SINGLE_TABLE #D8F9D3
+!define LOG_TABLE #EFEFEF
+
+@enduml
